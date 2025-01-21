@@ -6,14 +6,6 @@ This repo contains a minimal nix shell file (via a flake) that provides `CMake +
 
 See this guide: [link](https://www.kitware.com/import-std-in-cmake-3-30/)
 
-<!-- ## Example -->
-<!---->
-<!-- Assuming you have flakes support: -->
-<!---->
-<!-- ```bash -->
-<!---->
-<!-- ``` -->
-
 ```cpp
 # hello-world.cpp
 
@@ -23,6 +15,39 @@ auto main() -> int {
     std::cout << "Hello, World!\n";
     return 0;
 }
+```
+
+## Instructions
+
+### 1. Direct/Git
+
+1. clone this repo
+
+```sh
+git clone https://github.com/mtpham99/nixshell-cpp23-stdmodule.git
+```
+
+2. enter repo and load nix shell
+
+```sh
+cd nixshell-cpp23-stdmodule
+nix develop ./nix
+```
+
+3. build example
+
+```sh
+cmake -G Ninja -S . -B build
+cmake --build build
+./build/hello-world
+```
+
+### 2. Flakes Nix Shell
+
+Assuming you have flakes support you can skip the example and just load the shell environment directly:
+
+```sh
+nix develop github:mtpham99/nixshell-cpp23-stdmodule?dir=nix
 ```
 
 ## Notes / About
