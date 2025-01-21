@@ -12,6 +12,5 @@
   in
   {
       devShells."${system}".default = import ./shell.nix { inherit pkgs; };
-      packages."${system}".default = import ./shell.nix { inherit pkgs; };
   };
 }
