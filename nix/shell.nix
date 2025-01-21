@@ -1,5 +1,5 @@
 {
-  pkgs ? import <nixpkgs> { },
+  pkgs ? import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/300081d0cc72df578b02d914df941b8ec62240e6.tar.gz") { },
 }:
 let
   # Dummy/patch derivation (copied cmake derivation) to patch the `import std`
