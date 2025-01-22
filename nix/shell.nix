@@ -1,5 +1,5 @@
 {
-  pkgs ? import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/300081d0cc72df578b02d914df941b8ec62240e6.tar.gz") { },
+  pkgs ? import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/5757bbb8bd7c0630a0cc4bb19c47e588db30b97c.tar.gz") { },
 }:
 
 pkgs.mkShell.override { stdenv = pkgs.llvmPackages.libcxxStdenv; } {
