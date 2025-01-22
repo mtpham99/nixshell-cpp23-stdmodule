@@ -1,25 +1,14 @@
 # nix-shell-cpp23-std-module
 
-This was written on ***21 January 2025***.
+***This was written on 22 January 2025***
 
 This repo contains a minimal nix shell file (via a flake) that provides `CMake + Ninja + Clang w/ Libc++` that enables using the `c++23 std module` on NixOS.
 
 See this guide: [link](https://www.kitware.com/import-std-in-cmake-3-30/)
 
-```cpp
-# hello-world.cpp
-
-import std;
-
-auto main() -> int {
-    std::cout << "Hello, World!\n";
-    return 0;
-}
-```
-
 ## Instructions
 
-### 1. Direct/Git
+### 1. Direct / Local
 
 1. clone this repo
 
@@ -42,7 +31,7 @@ cmake --build build
 ./build/hello-world
 ```
 
-### 2. Flakes Nix Shell
+### 2. Flakes / Remote
 
 Assuming you have flakes support you can skip the example and just load the shell environment directly:
 
