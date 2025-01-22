@@ -1,4 +1,4 @@
-# Dummy cmake package for replacing the ImpostStd module.
+# Dummy cmake package for replacing the ImportStd module.
 # Symlink existing derivation to avoid rebuilding package from source.
 # I.e. rather than using overlay or override(Attr) to add patch.
 #
