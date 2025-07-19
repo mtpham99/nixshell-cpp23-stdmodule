@@ -1,10 +1,6 @@
-# nix-shell-cpp23-std-module
+# nixshell-cpp23-stdmodule
 
-***This was written on 22 January 2025***
-
-This repo contains a minimal nix shell file (via a flake) that provides `CMake + Ninja + Clang w/ Libc++` that enables using the `c++23 std module` on NixOS.
-
-See this guide: [link](https://www.kitware.com/import-std-in-cmake-3-30/)
+A minimal nix-shell providing CMake w/ c++23 import std support for both clang/libc++ and gcc/libstdc++.
 
 ```cpp
 import std;
@@ -35,9 +31,15 @@ $ nix develop ./nix
 3. build example
 
 ```sh
-$ cmake -G Ninja -S . -B build
-$ cmake --build build
-$ ./build/hello-world
+# Clang / libc++
+$ CXX=clang++ cmake -G Ninja -S . -B clang-build
+$ cmake --build clang-build
+$ ./clang-build/hello-world
+
+# GCC / libstdc++
+$ CXX=g++ cmake -G Ninja -S . -B gcc-build
+$ cmake --build gcc-build
+$ ./gcc-build/hello-world
 ```
 
 ### 2. Flakes / Remote
@@ -52,26 +54,29 @@ This should drop you directly into the shell provided by this repo. You can conf
 
 ```sh
 $ which cmake
-# /nix/store/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-cmake-3.31.3-importstd-module-patched/bin/cmake
+# /nix/store/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-cmake-3.31.7-importstd-patched/bin/cmake
 ```
 
 ## Notes / About
 
-### 1. Patching CMake Module
+[CMake](https://cmake.org/) has supported c++23 import std since [3.30 (see this guide)](https://www.kitware.com/import-std-in-cmake-3-30/), but only with clang/libc++. Support with gcc/libstdc++ was made available in [4.0.3](https://discourse.cmake.org/t/cmake-4-0-3-available-for-download/14242).
 
-Currently the setup requires patching the cmake module `Clang-CXX-CXXImportStd.cmake` for properly finding the `libc++.modules.json` manifest to determine libc++ std module support.
+Some modifications are required to get both working on NixOS as nixpkgs cmake is currently on version 3.31.7 [see update pr here](https://github.com/NixOS/nixpkgs/pull/394444).
 
-This is actually an issue with LLVM/Clang due to the `clang++ -print-file-name` not working properly (supposedly on MacOS + Linux). This is supposed to be patched in the most recently released LLVM 19.1.7 for MacOS, but not sure if it will also fix things for Linux. LLVM 19.1.7 is not yet merged in nixpkgs -- [pr here](https://github.com/NixOS/nixpkgs/pull/373937)).
+### 1. Patching CMake Modules
 
-The most simple workaround here is to patch the CMake module file directly, rather than trying to build the new LLVM release from source.
+Cmake supports import std w/ clang/libc++ since 3.30, but gcc import std support requires cmake 4.0.3. The only changes required for this support are cmake modules added/modified in [this](https://gitlab.kitware.com/cmake/cmake/-/commit/a980dab9b1a3514b3eae68cfb34806b263dc6bc3) cmake commit.
 
-Rather than trying to patch the CMake derivation, I simply made a dummy/patch derivation where the built official CMake derivation is copied and the module file is edited. This is to prevent rebuilding the entire package from source (e.g. when trying to use `overlays` or `overrideAttrs`).
+To avoid patching the entire cmake derivation/package, which requires rebuilding cmake from source as well as other packages which depend on it, a symlink package is created to only modify the cmake modules which allows reusing the existing cmake package in nixpkgs. See [here](/nix/cmake-importstd-patched/package.nix).
 
-For more info see these issues:
+This should not be required once nixpkgs updates cmake to version 4.0.3. [See update pr here](https://github.com/NixOS/nixpkgs/pull/394444).
 
-1. [https://gitlab.kitware.com/cmake/cmake/-/issues/25965#note_1523575](https://gitlab.kitware.com/cmake/cmake/-/issues/25965#note_1523575)
-2. [https://github.com/NixOS/nixpkgs/issues/370217](https://github.com/NixOS/nixpkgs/issues/370217)
+### 2. CMake cannot find libc++.modules.json
 
-### 2. Building the Libc++ Std Module
+On NixOS, cmake fails to find the `libc++.modules.json` file required for detecting std module support. See [this](https://github.com/NixOS/nixpkgs/issues/370217#issuecomment-2660926816) issue. A solution was found by [@gen740](https://github.com/gen740). [See this issue comment](https://github.com/NixOS/nixpkgs/issues/370217#issuecomment-2660926816)
+
+### 3. Building the Libc++ Std Module
 
 There is an [open issue](https://github.com/llvm/llvm-project/issues/121709) regarding failing to build the std module itself due to the `FORTIFY_SOURCE` C/CXX_FLAGS. These are enabled by default and need to be disabled.
+
+**`FORTIFY_SOURCE` HAS BEEN DISABLED IN THIS SHELL, BUT IS NOT REQUIRED TO BE DISABLED IF USING GCC/LIBSTDC++**.

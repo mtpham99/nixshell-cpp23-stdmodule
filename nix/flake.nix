@@ -1,5 +1,5 @@
 {
-  description = "C++23 Std Module: CMake + Ninja + Clang";
+  description = "nix-shell for c++23 import std support";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
